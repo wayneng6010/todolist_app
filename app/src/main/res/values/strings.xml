@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">To Do List</string>
+    <string name="empty_task">You have no task currently. Create one now !</string>
+    <string name="add_button">Add Task</string>
+    <string name="title_activity_add">Add Activity</string>
+    <string name="add_title_label">Add Task</string>
+    <string name="task_title">Title</string>
+    <string name="task_description">Description (Optional)</string>
+    <string name="task_priority">Priority</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+
+</resources>
