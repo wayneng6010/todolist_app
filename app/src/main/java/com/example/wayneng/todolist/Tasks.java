@@ -1,9 +1,9 @@
 package com.example.wayneng.todolist;
 
 public class Tasks {
-    private String mTitle;
-    private String mDescription;
-    private String mPriority;
+    public String mTitle;
+    public String mDescription;
+    public String mPriority;
 
     public Tasks(String title, String description, String priority){
         mTitle = title;

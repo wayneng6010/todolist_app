@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,52 +8,38 @@
     android:gravity="center"
     android:orientation="vertical" >
 
-    <TableLayout
-        android:id="@+id/list_layout_outer"
+    <ListView
+        android:id="@+id/listView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
-        <RelativeLayout
-            android:id="@+id/list_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="20dp">
+    <!--<TableLayout-->
+        <!--android:id="@+id/list_layout_outer"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
 
-            <CheckBox
-                android:id="@+id/task_checkbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+        <!--<RelativeLayout-->
+            <!--android:id="@+id/list_layout"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:padding="20dp">-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/task_checkbox"
-                android:text="@string/add_title_label" />
+            <!--<CheckBox-->
+                <!--android:id="@+id/task_checkbox"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content" />-->
 
-        </RelativeLayout>
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--android:layout_toRightOf="@+id/task_checkbox"-->
+                <!--android:text="@string/add_title_label" />-->
 
-        <RelativeLayout
-            android:id="@+id/fsd"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="20dp">
+        <!--</RelativeLayout>-->
 
-            <CheckBox
-                android:id="@+id/task_dsfcheckbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/task_dsfcheckbox"
-                android:text="@string/add_title_label" />
-
-        </RelativeLayout>
-
-    </TableLayout>
+    <!--</TableLayout>-->
 
     <TextView
         android:id="@+id/empty_list_label"
@@ -63,7 +49,7 @@
         android:text="@string/empty_task" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/newTaskBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
@@ -72,5 +58,5 @@
         app:backgroundTint="?attr/actionModeSplitBackground"
         app:srcCompat="@android:drawable/ic_input_add" />
 
-</FrameLayout>
+</LinearLayout>
 
