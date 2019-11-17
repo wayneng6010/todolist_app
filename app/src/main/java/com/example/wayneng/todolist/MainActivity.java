@@ -9,15 +9,19 @@ import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 
@@ -26,15 +30,15 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-
-
     private static final String task_title = "";
     private static final String task_description = "";
     private static final String task_priority = "";
     private ArrayList<Tasks> taskList = new ArrayList<Tasks>();
     private TextView mEmptyListLabel;
+    private TextView mAllTaskLabel;
     private RelativeLayout mListLayout;
     private TableLayout mListLayoutOuter;
+    private CheckBox mIsDone;
 
     @SuppressLint("ResourceType")
 //    private void updateTasks(){
@@ -85,9 +89,21 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getSupportActionBar().setTitle("Do Do"); // for set actionbar title
 
+        mEmptyListLabel = (TextView) findViewById(R.id.empty_list_label);
+        mAllTaskLabel = (TextView) findViewById(R.id.all_task_label);
         final ListView listView = findViewById(R.id.listView);
-        final TasksAdapter adapter = new TasksAdapter(this, taskList);
 
+        if (taskList.isEmpty()) {
+            mEmptyListLabel.setVisibility(View.VISIBLE); // makes label visible
+//            mAllTaskLabel.setVisibility(View.GONE); // makes label invisible
+            listView.setVisibility(View.GONE); // makes list invisible
+        } else {
+            mEmptyListLabel.setVisibility(View.GONE); // makes label invisible
+            mAllTaskLabel.setVisibility(View.VISIBLE); // makes label visible
+            listView.setVisibility(View.VISIBLE); // makes list visible
+        }
+
+        final TasksAdapter adapter = new TasksAdapter(this, taskList);
         //adapter.setData(taskList);
         listView.setAdapter(adapter);
 
@@ -106,8 +122,10 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton("Add Task", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                Tasks newTask = new Tasks(taskTitleInput.getText().toString(), null, null);
+                                Tasks newTask = new Tasks(taskTitleInput.getText().toString(), null, null, false);
                                 adapter.add(newTask);
+                                mEmptyListLabel.setVisibility(View.GONE); // makes label invisible
+                                listView.setVisibility(View.VISIBLE); // makes list visible
                             }
                         })
                         .setNegativeButton("Cancel", null)
@@ -115,14 +133,15 @@ public class MainActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
+
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode != Activity.RESULT_OK){
+        if (resultCode != Activity.RESULT_OK) {
             return;
         }
-        if (requestCode == 1){
+        if (requestCode == 1) {
             if (data == null) {
                 return;
             }
@@ -130,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
             String description = data.getStringExtra("description");
             String priority = data.getStringExtra("priority");
 
-            taskList.add(new Tasks(title, description, priority));
+            taskList.add(new Tasks(title, description, priority, false));
             //updateTasks();
         }
     }
@@ -141,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
             super(context, 0, tasks);
         }
 
-        void setData(List<Tasks> mTaskList){
+        void setData(List<Tasks> mTaskList) {
             taskList.clear();
             taskList.addAll(mTaskList);
             notifyDataSetChanged();
@@ -153,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public Tasks getItem(int position){
+        public Tasks getItem(int position) {
             return null;
         }
 
@@ -163,11 +182,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent){
+        public View getView(int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = (LayoutInflater) MainActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
             final View rowView = inflater.inflate(R.layout.item, parent, false);
             final TextView textView = rowView.findViewById(R.id.task);
             textView.setText(taskList.get(position).getTitle());
+            textView.setSelected(taskList.get(position).getIsDone());
+            rowView.setTag(position);
             return rowView;
         }
     }

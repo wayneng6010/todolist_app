@@ -4,11 +4,13 @@ public class Tasks {
     public String mTitle;
     public String mDescription;
     public String mPriority;
+    public boolean mIsDone;
 
-    public Tasks(String title, String description, String priority){
+    public Tasks(String title, String description, String priority, boolean isDone){
         mTitle = title;
         mDescription = description;
         mPriority = priority;
+        mIsDone = isDone;
     }
 
     public String getTitle() {
@@ -34,4 +36,8 @@ public class Tasks {
     public void setPriority(String priority) {
         mPriority = priority;
     }
+
+    public boolean getIsDone() { return mIsDone; }
+
+    public void setIsDone(boolean done) { mIsDone = done; }
 }
