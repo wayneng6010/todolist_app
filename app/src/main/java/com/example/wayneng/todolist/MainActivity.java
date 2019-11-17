@@ -6,9 +6,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +41,11 @@ public class MainActivity extends AppCompatActivity {
     private RelativeLayout mListLayout;
     private TableLayout mListLayoutOuter;
     private CheckBox mIsDone;
+
+    private RecyclerView listView;
+    private Parcelable mListState;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private TasksAdapter adapter;
 
     @SuppressLint("ResourceType")
 //    private void updateTasks(){
@@ -91,7 +98,24 @@ public class MainActivity extends AppCompatActivity {
 
         mEmptyListLabel = (TextView) findViewById(R.id.empty_list_label);
         mAllTaskLabel = (TextView) findViewById(R.id.all_task_label);
-        final ListView listView = findViewById(R.id.listView);
+        listView = findViewById(R.id.listView);
+        mLayoutManager = new LinearLayoutManager(this);
+        listView.setLayoutManager(mLayoutManager);
+
+        if (savedInstanceState != null) {
+            Toast.makeText(getApplicationContext(),"Hello",Toast.LENGTH_SHORT).show();
+
+            //mLayoutManager.onRestoreInstanceState(mListState);
+            //adapter.notifyDataSetChanged();
+            taskList = (ArrayList) savedInstanceState.getParcelableArrayList("taskList");
+            //ArrayList<Tasks> list = savedInstanceState.getParcelable("taskList");
+            //TasksAdapter adapter = new TasksAdapter(list);
+            //listView.setAdapter(adapter);
+
+            //mEmptyListLabel.setVisibility(View.GONE); // makes label invisible
+            //mAllTaskLabel.setVisibility(View.VISIBLE); // makes label visible
+            //listView.setVisibility(View.VISIBLE); // makes list visible
+        }
 
         if (taskList.isEmpty()) {
             mEmptyListLabel.setVisibility(View.VISIBLE); // makes label visible
@@ -103,7 +127,9 @@ public class MainActivity extends AppCompatActivity {
             listView.setVisibility(View.VISIBLE); // makes list visible
         }
 
-        final TasksAdapter adapter = new TasksAdapter(this, taskList);
+
+
+        adapter = new TasksAdapter(taskList);
         //adapter.setData(taskList);
         listView.setAdapter(adapter);
 
@@ -122,8 +148,9 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton("Add Task", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                Tasks newTask = new Tasks(taskTitleInput.getText().toString(), null, null, false);
-                                adapter.add(newTask);
+                                taskList.add(new Tasks(taskTitleInput.getText().toString(), null, null, false));
+                                //adapter.add(newTask);
+                                adapter.notifyDataSetChanged();
                                 mEmptyListLabel.setVisibility(View.GONE); // makes label invisible
                                 listView.setVisibility(View.VISIBLE); // makes list visible
                             }
@@ -134,6 +161,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        if (savedInstanceState != null) {
+            Toast.makeText(getApplicationContext(),"Hello",Toast.LENGTH_SHORT).show();
+
+            //mLayoutManager.onRestoreInstanceState(mListState);
+            //adapter.notifyDataSetChanged();
+            ArrayList<Tasks> list = savedInstanceState.getParcelable("taskList");
+            TasksAdapter adapter = new TasksAdapter(list);
+            //listView.setAdapter(adapter);
+
+            mEmptyListLabel.setVisibility(View.GONE); // makes label invisible
+            mAllTaskLabel.setVisibility(View.VISIBLE); // makes label visible
+            listView.setVisibility(View.VISIBLE); // makes list visible
+        }
     }
 
     @Override
@@ -154,43 +194,111 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    class TasksAdapter extends ArrayAdapter<Tasks> {
+    private class TaskHolder extends RecyclerView.ViewHolder {
+        private TextView mTitleTextView;
+        private TextView mDateTextView;
+        private CheckBox mSolvedCheckBox;
 
-        public TasksAdapter(Context context, ArrayList<Tasks> tasks) {
-            super(context, 0, tasks);
+        private Tasks mTask;
+
+        public TaskHolder(View itemView) {
+            super(itemView);
+            mTitleTextView = (TextView) itemView.findViewById(R.id.task);
+            //mDateTextView = (TextView) itemView.findViewById(R.id.list_item_crime_date_text_view);
+            //mSolvedCheckBox = (CheckBox) itemView.findViewById(R.id.list_item_crime_solved_check_box);
         }
 
-        void setData(List<Tasks> mTaskList) {
-            taskList.clear();
-            taskList.addAll(mTaskList);
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public int getCount() {
-            return taskList.size();
-        }
-
-        @Override
-        public Tasks getItem(int position) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            LayoutInflater inflater = (LayoutInflater) MainActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-            final View rowView = inflater.inflate(R.layout.item, parent, false);
-            final TextView textView = rowView.findViewById(R.id.task);
-            textView.setText(taskList.get(position).getTitle());
-            textView.setSelected(taskList.get(position).getIsDone());
-            rowView.setTag(position);
-            return rowView;
+        public void bindCrime(Tasks task) {
+            mTask = task;
+            mTitleTextView.setText(mTask.getTitle());
+            //mDateTextView.setText(mTask.getDate().toString());
+            //mSolvedCheckBox.setChecked(mTask.isSolved());
         }
     }
+
+    class TasksAdapter extends RecyclerView.Adapter<TaskHolder> {
+
+        private List<Tasks> mTasks;
+        public TasksAdapter(List<Tasks> tasks) {
+            mTasks = tasks;
+        }
+
+        @Override
+        public TaskHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+            //LayoutInflater layoutInflater = (LayoutInflater) MainActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View view = layoutInflater.inflate(R.layout.item, parent, false);
+            return new TaskHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(TaskHolder holder, int position) {
+            Tasks crime = mTasks.get(position);
+            holder.bindCrime(crime);
+        }
+
+        @Override
+        public int getItemCount() {
+            return mTasks.size();
+        }
+
+        public List<Tasks> getList() {
+            return mTasks;
+        }
+
+//        public TasksAdapter(Context context, ArrayList<Tasks> tasks) {
+//            super(context, 0, tasks);
+//        }
+//
+//        void setData(List<Tasks> mTaskList) {
+//            taskList.clear();
+//            taskList.addAll(mTaskList);
+//            notifyDataSetChanged();
+//        }
+//
+//        @Override
+//        public int getCount() {
+//            return taskList.size();
+//        }
+//
+//        @Override
+//        public Tasks getItem(int position) {
+//            return null;
+//        }
+//
+//        @Override
+//        public long getItemId(int position) {
+//            return 0;
+//        }
+//
+//        @Override
+//        public View getView(int position, View convertView, ViewGroup parent) {
+//            LayoutInflater inflater = (LayoutInflater) MainActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//
+//            final View rowView = inflater.inflate(R.layout.item, parent, false);
+//            final TextView textView = rowView.findViewById(R.id.task);
+//            textView.setText(taskList.get(position).getTitle());
+//            textView.setSelected(taskList.get(position).getIsDone());
+//            rowView.setTag(position);
+//            return rowView;
+//        }
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save list state
+        //mListState = mLayoutManager.onSaveInstanceState();
+        //savedInstanceState.putParcelableArrayList("taskList", (ArrayList) taskList);
+        savedInstanceState.putParcelableArrayList("taskList", (ArrayList) new ArrayList<Tasks>(adapter.getList()));
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+//    protected void onRestoreInstanceState(Bundle state) {
+//        super.onRestoreInstanceState(state);
+//        // Retrieve list state and list/item positions
+//        if(state != null){
+//            mListState = state.getParcelable("taskList");
+//        }
+//    }
 }
